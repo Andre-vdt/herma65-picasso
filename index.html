@@ -350,6 +350,10 @@
 
   .error-msg { color: var(--red); font-size: 0.82rem; margin-top: 6px; display: none; }
   .error-msg.show { display: block; }
+  .allergens { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .allergen-tag { display: inline-flex; align-items: center; gap: 3px; font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; background: #f5f0e8; color: #5a4a2a; border: 1px solid #e0d5c0; }
+  textarea { width: 100%; padding: 12px 16px; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text); resize: vertical; min-height: 80px; transition: border-color 0.2s; }
+  textarea:focus { outline: none; border-color: var(--green); }
 
   @media (max-width: 480px) {
     .type-select { grid-template-columns: 1fr 1fr; }
@@ -474,6 +478,10 @@
     </div>
     <div class="options-list" id="dessertList"></div>
     <div class="error-msg" id="dessertError">Maak een keuze om verder te gaan.</div>
+    <div class="field-group" style="margin-top:1.2rem;">
+      <label class="field-label">Allergieën of opmerkingen</label>
+      <textarea id="guestRemarks" placeholder="Bijv. allergisch voor pijnboompitten, lactose-intolerant, geen ui..."></textarea>
+    </div>
     <div class="nav">
       <button class="btn-secondary" onclick="goBack(4)">← Terug</button>
       <button class="btn-primary" onclick="goNext(4)">Bevestigen →</button>
@@ -517,6 +525,10 @@
         <span id="confirmTotal"></span>
       </div>
     </div>
+    <div id="confirmRemarksRow" style="display:none; margin-top:10px; padding:12px 16px; background:#fff4e5; border:1px solid #f0c070; border-radius:10px; font-size:0.88rem;">
+      <span style="font-weight:500; color:#7a4a00;">⚠️ Allergie / opmerking:</span>
+      <span id="confirmRemarksText" style="color:#5a3a00; margin-left:6px;"></span>
+    </div>
     <div class="nav">
       <button class="btn-secondary" onclick="goBack(5)">← Terug</button>
       <button class="btn-primary" onclick="submitOrder()">Bestelling versturen ✓</button>
@@ -548,54 +560,65 @@
 <script>
 const FORMSPREE = 'https://formspree.io/f/xpqknwdg'; // Vervang met jouw Formspree ID
 
+const ALLERGENS = {
+  1: '🥚 Ei', 2: '🐟 Vis', 3: '☪️ Halal', 4: '🥛 Melk', 5: '🟡 Mosterd',
+  6: '🥜 Noten', 7: '🥜 Pinda\'s', 8: '🌶️ Pittig', 9: '🌶️ Extra pittig',
+  10: '🌾 Gluten', 11: '🫘 Soja', 12: '🧂 Sulfiet', 13: '🥗 Vegetarisch', 14: '🦀 Schaaldieren'
+};
+
+function allergenBadges(nums) {
+  if (!nums || nums.length === 0) return '';
+  return '<div class="allergens">' + nums.map(n => `<span class="allergen-tag">${ALLERGENS[n] || n}</span>`).join('') + '</div>';
+}
+
 const starters = [
-  { name: 'Panne e buro', desc: 'Focaccia met kruidenboter', price: 5.75 },
-  { name: 'Zuppe di Cipolle', desc: 'Uiensoep met Parmezaanse kaas', price: 5.75 },
-  { name: 'Zuppa di Pomodori', desc: 'Romige tomatensoep met Parmezaanse kaas', price: 5.75 },
-  { name: 'Scampi', desc: 'Gamba\'s in kruidenboter', price: 9.00 },
-  { name: 'Funghi alla panne', desc: 'Champignons in roomsaus', price: 6.50 },
-  { name: 'Carpaccio', desc: 'Dungesneden rauwe runderlende, dressing, pijnboompitten, kapertjes en Parmezaanse kaas. Saus: Truffelmayonaise of balsanicodressing', price: 10.95 },
-  { name: 'Salade Caprese', desc: 'Pommodoro tomaten en mozzarella, met een dressing en pesto', price: 9.95 },
-  { name: 'Salade Mista', desc: 'Gemengde salade, knapperige ijsbergsla, tomaten, komkommer, rode ui, zwarte olijven, rucola en een dressing', price: 8.75 },
+  { name: 'Panne e buro', desc: 'Focaccia met kruidenboter', price: 5.75, allergens: [10, 4] },
+  { name: 'Zuppe di Cipolle', desc: 'Uiensoep met Parmezaanse kaas', price: 5.75, allergens: [4, 10] },
+  { name: 'Zuppa di Pomodori', desc: 'Romige tomatensoep met Parmezaanse kaas', price: 5.75, allergens: [4] },
+  { name: 'Scampi', desc: 'Gamba\'s in kruidenboter', price: 9.00, allergens: [14, 4, 10] },
+  { name: 'Funghi alla panne', desc: 'Champignons in roomsaus', price: 6.50, allergens: [4, 13] },
+  { name: 'Carpaccio', desc: 'Dungesneden rauwe runderlende, dressing, pijnboompitten, kapertjes en Parmezaanse kaas. Saus: Truffelmayonaise of balsanicodressing', price: 10.95, allergens: [1, 4, 6, 7, 5] },
+  { name: 'Salade Caprese', desc: 'Pommodoro tomaten en mozzarella, met een dressing en pesto', price: 9.95, allergens: [4, 6, 13] },
+  { name: 'Salade Mista', desc: 'Gemengde salade, knapperige ijsbergsla, tomaten, komkommer, rode ui, zwarte olijven, rucola en een dressing', price: 8.75, allergens: [13] },
 ];
 
 const mains = [
-  { name: 'Bistecca al Ferri', desc: 'Entrecote van de grill. Keuze: Champignonroomsaus +3.25 / Gorgonzolasaus +3.25 / Pepe cremesaus +3.00', price: 19.95, cat: 'vlees' },
-  { name: 'Hamburger di Angus 200gr', desc: 'Luchtig broodje met 100% Angusburger, gebakken ei, spek, tomaten, cheddarkaas, jalapeño peper, burgersaus en frietjes', price: 16.95, cat: 'vlees' },
-  { name: 'Lamskotelletten', desc: 'Van de grill', price: 22.00, cat: 'vlees' },
-  { name: 'Mixed Grill', desc: 'Drie soorten vlees van de grill: kipfilet, Adana kebab, shoarma en een sausje naar keuze', price: 19.50, cat: 'vlees' },
-  { name: 'Boerenschotel Kip/Kalf', desc: 'Friet met döner kip of kalf stukjes, gesmolten kaas, knapperige ijsbergsla, tomaten en komkommer. Met een sausje naar keuze', price: 14.00, cat: 'vlees' },
-  { name: 'Boerenschotel Picasso', desc: 'Friet bedekt met gegrilde kipstukjes en gemarineerde gamba\'s, gesmolten kaas, ijsbergsla, tomaten en komkommer. Sausje naar keuze', price: 16.00, cat: 'vlees' },
-  { name: 'Hamburger di Pollo', desc: 'Luchtig gebakken broodje met kipfilet van de grill, sla, rode ui, tomaten en cheddarkaas', price: 15.95, cat: 'vlees' },
-  { name: 'Gegrilde Zalm', desc: 'Zalm van de grill met een frisse roomsaus. Keuze: Gorgonzolasaus +3.25 / Champignonroomsaus +3.25 / Limoncellosaus +3.25', price: 17.75, cat: 'vis' },
-  { name: 'Stufado di Roma', desc: 'Langzaam gegaard stoofpotje van heerlijk rundvlees en groenten. Geserveerd met knoflookbrood en frietjes', price: 19.95, cat: 'vlees' },
-  { name: 'Spiedino di Pollo 300gr', desc: 'Italiaans gekruide kipspies. Keuze: satesaus +3.00 / Champignonroomsaus +3.25 / Gorgonzolasaus +3.25', price: 15.95, cat: 'vlees' },
-  { name: 'Alla Bolognese (pasta)', desc: 'Saus van tomaten, 100% rundergehakt en Parmezaanse kaas', price: 13.75, cat: 'pasta' },
-  { name: 'Alla Carbonara (pasta)', desc: 'Ham, spek, ui, eieren in roomsaus', price: 13.75, cat: 'pasta' },
-  { name: 'Pollo (pasta)', desc: 'Champignons, kip, ui, knoflook in roomsaus', price: 14.50, cat: 'pasta' },
-  { name: 'Pesto (pasta)', desc: 'Gegrilde kipstukjes, uien, tomaten, pijnboompitten, in pestosaus met Parmezaanse kaas', price: 16.75, cat: 'pasta' },
-  { name: 'Marinara (pasta)', desc: 'Zalmsnippers, garnalen, tonijn, mosselen, ansjovis, ui, jalapeño pepers, kappertjes in tomatensaus', price: 14.95, cat: 'vis' },
-  { name: 'Vegetariane (pasta)', desc: 'Champignons, paprika, ui, olijven, kappertjes, knoflook, Spaanse pepertjes in tomatensaus', price: 14.75, cat: 'vegetarisch' },
-  { name: 'Quatro Formaggi (pasta)', desc: 'Saus van vier soorten kaas: Gorgonzola, Parmezaanse kaas, Mozzarella en Rigatello', price: 14.75, cat: 'pasta' },
-  { name: 'Cannelloni', desc: 'Cannellonitubes gevuld met bladspinazie, Mozzarella en Ricotta in tomatensaus met Parmezaanse kaas', price: 15.00, cat: 'vegetarisch' },
-  { name: 'Salmone (pasta)', desc: 'Zalm, uien, spinazie, garnalen in roomsaus', price: 16.75, cat: 'vis' },
-  { name: 'Pizza Margherita', desc: 'Tomatensaus, kaas en oregano', price: 10.75, cat: 'vegetarisch' },
-  { name: 'Pizza Campagnola', desc: 'Tomatensaus, kaas, champignons, paprika en uien', price: 11.75, cat: 'vegetarisch' },
-  { name: 'Pizza Calzone', desc: 'Dubbelgevouwen pizza met tomatensaus, kaas, ham en salami', price: 12.00, cat: 'pizza' },
-  { name: 'Pizza Pollo Piccante', desc: 'Tomatensaus, kaas, gegrilde kipstukjes en Spaanse pepers', price: 15.00, cat: 'pizza' },
-  { name: 'Pizza Picasso (specialiteit)', desc: 'Specialiteit van het huis: tomatensaus, kaas, ham, salami, champignons, shoarma en gegrilde kipstukjes', price: 16.75, cat: 'pizza' },
-  { name: 'Lasagne Con Bechamelle', desc: 'Lasagne met Bechamel- en bolognesesaus', price: 14.75, cat: 'pasta' },
-  { name: 'Lasagne Di Mare', desc: 'Lasagne van een gemengde vis, paprika, uien in tomatensaus', price: 15.75, cat: 'vis' },
-  { name: 'Lasagne Hete Kip', desc: 'Lasagne bladen, stukjes kipfilet, uien, champignonroomsaus', price: 16.50, cat: 'vlees' },
+  { name: 'Bistecca al Ferri', desc: 'Entrecote van de grill. Keuze: Champignonroomsaus +3.25 / Gorgonzolasaus +3.25 / Pepe cremesaus +3.00', price: 19.95, cat: 'vlees', allergens: [4] },
+  { name: 'Hamburger di Angus 200gr', desc: 'Luchtig broodje met 100% Angusburger, gebakken ei, spek, tomaten, cheddarkaas, jalapeño peper, burgersaus en frietjes', price: 16.95, cat: 'vlees', allergens: [1, 4, 10] },
+  { name: 'Lamskotelletten', desc: 'Van de grill', price: 22.00, cat: 'vlees', allergens: [] },
+  { name: 'Mixed Grill', desc: 'Drie soorten vlees van de grill: kipfilet, Adana kebab, shoarma en een sausje naar keuze', price: 19.50, cat: 'vlees', allergens: [10] },
+  { name: 'Boerenschotel Kip/Kalf', desc: 'Friet met döner kip of kalf stukjes, gesmolten kaas, knapperige ijsbergsla, tomaten en komkommer. Met een sausje naar keuze', price: 14.00, cat: 'vlees', allergens: [4, 10] },
+  { name: 'Boerenschotel Picasso', desc: 'Friet bedekt met gegrilde kipstukjes en gemarineerde gamba\'s, gesmolten kaas, ijsbergsla, tomaten en komkommer. Sausje naar keuze', price: 16.00, cat: 'vlees', allergens: [4, 14, 10] },
+  { name: 'Hamburger di Pollo', desc: 'Luchtig gebakken broodje met kipfilet van de grill, sla, rode ui, tomaten en cheddarkaas', price: 15.95, cat: 'vlees', allergens: [4, 10] },
+  { name: 'Gegrilde Zalm', desc: 'Zalm van de grill met een frisse roomsaus. Keuze: Gorgonzolasaus +3.25 / Champignonroomsaus +3.25 / Limoncellosaus +3.25', price: 17.75, cat: 'vis', allergens: [2, 4] },
+  { name: 'Stufado di Roma', desc: 'Langzaam gegaard stoofpotje van heerlijk rundvlees en groenten. Geserveerd met knoflookbrood en frietjes', price: 19.95, cat: 'vlees', allergens: [10, 4] },
+  { name: 'Spiedino di Pollo 300gr', desc: 'Italiaans gekruide kipspies. Keuze: satesaus +3.00 / Champignonroomsaus +3.25 / Gorgonzolasaus +3.25', price: 15.95, cat: 'vlees', allergens: [7, 4] },
+  { name: 'Alla Bolognese (pasta)', desc: 'Saus van tomaten, 100% rundergehakt en Parmezaanse kaas', price: 13.75, cat: 'pasta', allergens: [10, 4] },
+  { name: 'Alla Carbonara (pasta)', desc: 'Ham, spek, ui, eieren in roomsaus', price: 13.75, cat: 'pasta', allergens: [1, 4, 10] },
+  { name: 'Pollo (pasta)', desc: 'Champignons, kip, ui, knoflook in roomsaus', price: 14.50, cat: 'pasta', allergens: [4, 10] },
+  { name: 'Pesto (pasta)', desc: 'Gegrilde kipstukjes, uien, tomaten, pijnboompitten, in pestosaus met Parmezaanse kaas', price: 16.75, cat: 'pasta', allergens: [6, 7, 4, 10] },
+  { name: 'Marinara (pasta)', desc: 'Zalmsnippers, garnalen, tonijn, mosselen, ansjovis, ui, jalapeño pepers, kappertjes in tomatensaus', price: 14.95, cat: 'vis', allergens: [2, 14, 10] },
+  { name: 'Vegetariane (pasta)', desc: 'Champignons, paprika, ui, olijven, kappertjes, knoflook, Spaanse pepertjes in tomatensaus', price: 14.75, cat: 'vegetarisch', allergens: [10, 13] },
+  { name: 'Quatro Formaggi (pasta)', desc: 'Saus van vier soorten kaas: Gorgonzola, Parmezaanse kaas, Mozzarella en Rigatello', price: 14.75, cat: 'pasta', allergens: [4, 10] },
+  { name: 'Cannelloni', desc: 'Cannellonitubes gevuld met bladspinazie, Mozzarella en Ricotta in tomatensaus met Parmezaanse kaas', price: 15.00, cat: 'vegetarisch', allergens: [4, 10, 13] },
+  { name: 'Salmone (pasta)', desc: 'Zalm, uien, spinazie, garnalen in roomsaus', price: 16.75, cat: 'vis', allergens: [2, 14, 4, 10] },
+  { name: 'Pizza Margherita', desc: 'Tomatensaus, kaas en oregano', price: 10.75, cat: 'vegetarisch', allergens: [4, 10, 13] },
+  { name: 'Pizza Campagnola', desc: 'Tomatensaus, kaas, champignons, paprika en uien', price: 11.75, cat: 'vegetarisch', allergens: [4, 10, 13] },
+  { name: 'Pizza Calzone', desc: 'Dubbelgevouwen pizza met tomatensaus, kaas, ham en salami', price: 12.00, cat: 'pizza', allergens: [4, 10] },
+  { name: 'Pizza Pollo Piccante', desc: 'Tomatensaus, kaas, gegrilde kipstukjes en Spaanse pepers', price: 15.00, cat: 'pizza', allergens: [4, 8, 10] },
+  { name: 'Pizza Picasso (specialiteit)', desc: 'Specialiteit van het huis: tomatensaus, kaas, ham, salami, champignons, shoarma en gegrilde kipstukjes', price: 16.75, cat: 'pizza', allergens: [4, 10] },
+  { name: 'Lasagne Con Bechamelle', desc: 'Lasagne met Bechamel- en bolognesesaus', price: 14.75, cat: 'pasta', allergens: [1, 4, 10] },
+  { name: 'Lasagne Di Mare', desc: 'Lasagne van een gemengde vis, paprika, uien in tomatensaus', price: 15.75, cat: 'vis', allergens: [2, 14, 1, 4, 10] },
+  { name: 'Lasagne Hete Kip', desc: 'Lasagne bladen, stukjes kipfilet, uien, champignonroomsaus', price: 16.50, cat: 'vlees', allergens: [4, 10] },
 ];
 
 const desserts = [
-  { name: 'Tiramisu', desc: 'Klassiek Italiaans dessert', price: 6.50 },
-  { name: 'Panna Cotta', desc: 'Met vers fruit of coulis', price: 6.00 },
-  { name: 'Gelato', desc: 'Twee bolletjes Italiaans ijs naar keuze', price: 5.50 },
-  { name: 'Cheesecake', desc: 'Huisgemaakte cheesecake', price: 6.50 },
-  { name: 'Irish Coffee', desc: 'Koffie met Irish whiskey en slagroom', price: 7.50 },
-  { name: 'Spanish Coffee', desc: 'Koffie met Tia Maria en slagroom', price: 7.50 },
+  { name: 'Tiramisu', desc: 'Klassiek Italiaans dessert', price: 6.50, allergens: [1, 4, 10] },
+  { name: 'Panna Cotta', desc: 'Met vers fruit of coulis', price: 6.00, allergens: [4] },
+  { name: 'Gelato', desc: 'Twee bolletjes Italiaans ijs naar keuze', price: 5.50, allergens: [4, 1, 6, 7] },
+  { name: 'Cheesecake', desc: 'Huisgemaakte cheesecake', price: 6.50, allergens: [1, 4, 10] },
+  { name: 'Irish Coffee', desc: 'Koffie met Irish whiskey en slagroom', price: 7.50, allergens: [4] },
+  { name: 'Spanish Coffee', desc: 'Koffie met Tia Maria en slagroom', price: 7.50, allergens: [4] },
 ];
 
 const kindStarters = [
@@ -620,7 +643,7 @@ const kindDesserts = [
 
 let currentScreen = 1;
 let guestType = 'volwassene';
-let selections = { name: '', starter: null, main: null, dessert: null };
+let selections = { name: '', starter: null, main: null, dessert: null, remarks: '' };
 let orders = [];
 
 function selectType(type) {
@@ -636,12 +659,14 @@ function renderOptions(items, containerId, groupName) {
     const label = document.createElement('label');
     label.className = 'opt-card';
     const catLabel = item.cat ? `<span class="opt-cat cat-${item.cat}">${item.cat}</span><br>` : '';
+    const allergensHtml = allergenBadges(item.allergens);
     label.innerHTML = `
       <input type="radio" name="${groupName}" value="${i}" onchange="selectOpt(this)">
       <div class="opt-info">
         ${catLabel}
         <div class="opt-name">${item.name}</div>
         <div class="opt-desc">${item.desc}</div>
+        ${allergensHtml}
       </div>
       <div class="opt-price">€ ${item.price.toFixed(2)}</div>
     `;
@@ -704,6 +729,7 @@ function goNext(from) {
     document.getElementById('dessertError').classList.remove('show');
     const dl = guestType === 'kind' ? kindDesserts : desserts;
     selections.dessert = dl[parseInt(d.value)];
+    selections.remarks = document.getElementById('guestRemarks').value.trim();
     // Fill confirm
     document.getElementById('confirmName').textContent = selections.name + (guestType === 'kind' ? ' (kind)' : '');
     document.getElementById('confirmStarter').textContent = selections.starter.name;
@@ -714,6 +740,13 @@ function goNext(from) {
     document.getElementById('confirmDessertPrice').textContent = '€ ' + selections.dessert.price.toFixed(2);
     const total = selections.starter.price + selections.main.price + selections.dessert.price;
     document.getElementById('confirmTotal').textContent = '€ ' + total.toFixed(2);
+    const remarksRow = document.getElementById('confirmRemarksRow');
+    if (selections.remarks) {
+      document.getElementById('confirmRemarksText').textContent = selections.remarks;
+      remarksRow.style.display = 'block';
+    } else {
+      remarksRow.style.display = 'none';
+    }
     showScreen(5);
   }
 }
@@ -729,6 +762,7 @@ function submitOrder() {
     starter: selections.starter.name,
     main: selections.main.name,
     dessert: selections.dessert.name,
+    remarks: selections.remarks,
     total: (selections.starter.price + selections.main.price + selections.dessert.price).toFixed(2)
   };
 
@@ -742,6 +776,7 @@ function submitOrder() {
       voorgerecht: order.starter,
       hoofdgerecht: order.main,
       dessert: order.dessert,
+      allergieen_opmerkingen: order.remarks || '—',
       totaal: '€ ' + order.total
     })
   }).catch(() => {}); // Silently handle if no Formspree set up yet
@@ -769,7 +804,7 @@ function renderOrders() {
       <div class="order-pill-detail">
         🥗 ${o.starter}<br>
         🍽️ ${o.main}<br>
-        ☕ ${o.dessert}
+        ☕ ${o.dessert}${o.remarks ? `<br>⚠️ <em>${o.remarks}</em>` : ''}
       </div>
     `;
     list.appendChild(el);
@@ -784,9 +819,10 @@ function clearAll() {
 }
 
 function resetForm() {
-  selections = { name: '', starter: null, main: null, dessert: null };
+  selections = { name: '', starter: null, main: null, dessert: null, remarks: '' };
   guestType = 'volwassene';
   document.getElementById('guestName').value = '';
+  document.getElementById('guestRemarks').value = '';
   document.getElementById('typeAdult').classList.add('selected');
   document.getElementById('typeChild').classList.remove('selected');
   document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
