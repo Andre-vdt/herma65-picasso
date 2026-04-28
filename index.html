@@ -156,6 +156,13 @@ textarea:focus{outline:none;border-color:var(--green);}
   }
   #printArea{display:none;}
 
+
+  .order-actions{display:flex;gap:6px;margin-top:8px;}
+  .order-del-btn{font-size:0.75rem;padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;}
+  .order-del-btn:hover{border-color:var(--red);color:var(--red);}
+  .order-edit-btn{font-size:0.75rem;padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;}
+  .order-edit-btn:hover{border-color:var(--green);color:var(--green);}
+
 </style>
 </head>
 <body>
@@ -355,7 +362,7 @@ function showReport(type){
     document.getElementById('reportTitle').childNodes[0].textContent='Gastenlijst ';
     content.innerHTML='<div class="report-section">'+orders.map((o,i)=>{
       const total=parseFloat(o.total)>0?'\u20AC '+o.total:'\u2014';
-      return '<div class="report-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><div style="display:flex;justify-content:space-between;width:100%;"><span class="report-guest-name">'+(i+1)+'. '+o.name+(o.type==='kind'?' <span class="badge-kind">kind</span>':'')+'</span><span class="price-admin" style="font-weight:500;color:var(--green);">'+total+'</span></div><div class="report-guest-detail">\uD83E\uDD57 '+o.starter+'<br>\uD83C\uDF7D\uFE0F '+o.main+(o.mainSauce?' ('+o.mainSauce+')':'')+'<br>\uD83C\uDF6E '+o.dessert+'</div>'+(o.remarks?'<div class="report-guest-remark">\u26A0\uFE0F '+o.remarks+'</div>':'')+'</div>';
+      return '<div class="report-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><div style="display:flex;justify-content:space-between;width:100%;"><span class="report-guest-name">'+(i+1)+'. '+o.name+(o.type==='kind'?' <span class="badge-kind">kind</span>':'')+'</span><span class="price-admin" style="font-weight:500;color:var(--green);">'+total+'</span></div><div class="report-guest-detail">\uD83E\uDD57 '+o.starter+'<br>\uD83C\uDF7D\uFE0F '+o.main+(o.mainSauce?' ('+o.mainSauce+')':'')+'<br>\uD83C\uDF6E '+o.dessert+'</div>'+(o.remarks?'<div class="report-guest-remark">\u26A0\uFE0F '+o.remarks+'</div>':'')+'<div class="order-actions"><button class="order-edit-btn" onclick="closeReport();editOrder('+i+')">\u270F\uFE0F Wijzigen</button><button class="order-del-btn" onclick="closeReport();deleteOrder('+i+')">\uD83D\uDDD1 Verwijderen</button></div></div>';
     }).join('')+'</div>';
   }
   document.getElementById('reportPanel').classList.add('show');
