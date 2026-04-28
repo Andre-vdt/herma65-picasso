@@ -3,137 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Keuzemenu — Ristorante Picasso</title>
+<title>Keuzemenu - Ristorante Picasso</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --green: #1a6b3c; --green-light: #e8f4ee; --red: #c0392b; --red-light: #fdecea;
-    --gold: #b8860b; --cream: #faf8f3; --border: #e0dbd0; --text: #1c1c1c; --muted: #6b6560; --white: #ffffff;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
-  .flag-bar { display: flex; height: 5px; }
-  .flag-bar div { flex: 1; }
-  .flag-bar .f1 { background: #009246; }
-  .flag-bar .f2 { background: #fff; border-top: 1px solid #e0dbd0; border-bottom: 1px solid #e0dbd0; }
-  .flag-bar .f3 { background: #ce2b37; }
-  header { text-align: center; padding: 2.5rem 1rem 1.5rem; background: var(--white); border-bottom: 1px solid var(--border); }
-  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem,6vw,3.2rem); font-weight: 600; letter-spacing: 0.12em; }
-  header p { font-size: 0.85rem; letter-spacing: 0.18em; color: var(--muted); margin-top: 4px; text-transform: uppercase; }
-  header .since { display: inline-block; margin-top: 10px; font-size: 0.75rem; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; }
-  .container { max-width: 680px; margin: 0 auto; padding: 2rem 1rem 4rem; }
-
-  .steps { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
-  .step { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .step-num { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--muted); transition: all 0.3s; }
-  .step.active .step-num { background: var(--green); border-color: var(--green); color: white; }
-  .step.done .step-num { background: var(--green-light); border-color: var(--green); color: var(--green); }
-  .step-label { font-size: 11px; color: var(--muted); }
-  .step.active .step-label { color: var(--green); font-weight: 500; }
-  .step-line { flex: 1; height: 1px; background: var(--border); min-width: 20px; max-width: 50px; margin-bottom: 16px; }
-
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  .welcome-text { text-align: center; margin-bottom: 2rem; }
-  .welcome-text h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 8px; }
-  .welcome-text p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
-
-  .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px; display: block; }
-  input[type=text] { width: 100%; padding: 13px 16px; font-size: 1rem; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text); }
-  input[type=text]:focus { outline: none; border-color: var(--green); }
-  .field-group { margin-bottom: 1.2rem; }
-
-  .type-select { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
-  .type-btn { padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); cursor: pointer; text-align: center; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
-  .type-btn.selected { border-color: var(--green); background: var(--green-light); }
-  .type-btn .type-icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
-  .type-btn .type-name { font-size: 0.95rem; font-weight: 500; }
-  .type-btn .type-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-
-  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .section-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-  .section-icon.green { background: var(--green-light); }
-  .section-icon.red { background: var(--red-light); }
-  .section-icon.gold { background: #fdf6e3; }
-  .section-head h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 400; }
-  .section-head p { font-size: 0.82rem; color: var(--muted); margin-top: 1px; }
-
-  .options-list { display: flex; flex-direction: column; gap: 8px; margin: 1rem 0; }
-  .opt-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); cursor: pointer; transition: all 0.18s; }
-  .opt-card:hover { border-color: #aaa; }
-  .opt-card.selected { border-color: var(--green); background: var(--green-light); }
-  .opt-card.skip-card { background: var(--cream); border-style: dashed; }
-  .opt-card.skip-card.selected { background: var(--green-light); border-style: solid; }
-  .opt-card input[type=radio] { margin-top: 3px; accent-color: var(--green); flex-shrink: 0; width: 16px; height: 16px; }
-  .opt-info { flex: 1; }
-  .opt-name { font-size: 0.95rem; font-weight: 500; }
-  .opt-desc { font-size: 0.8rem; color: var(--muted); margin-top: 3px; line-height: 1.45; }
-  .opt-cat { display: inline-block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 20px; margin-bottom: 3px; }
-  .cat-vlees { background: #fdecea; color: #8b2020; }
-  .cat-vis { background: #e8f0fb; color: #1a4080; }
-  .cat-pasta { background: #fff4e5; color: #7a4a00; }
-  .cat-pizza { background: #fdf0f8; color: #6b1a55; }
-  .cat-lasagne { background: #f0e8fd; color: #3d1a80; }
-  .cat-vegetarisch { background: var(--green-light); color: var(--green); }
-  .cat-koffie { background: #f5efe6; color: #5a3a10; }
-  .opt-price { font-size: 0.88rem; font-weight: 500; color: var(--green); flex-shrink: 0; padding-left: 8px; margin-top: 2px; text-align: right; min-width: 52px; }
-
-  .allergens { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-  .allergen-tag { font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; background: #f5f0e8; color: #5a4a2a; border: 1px solid #e0d5c0; }
-
-  .sauce-selector { margin-top: 8px; padding: 10px 12px; background: #fffdf7; border: 1px dashed #d0c8b0; border-radius: 8px; }
-  .sauce-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; display: block; }
-  .sauce-options { display: flex; flex-wrap: wrap; gap: 6px; }
-  .sauce-btn { padding: 4px 12px; font-size: 0.78rem; border: 1px solid var(--border); border-radius: 20px; background: var(--white); cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text); transition: all 0.15s; }
-  .sauce-btn.selected { background: var(--green); color: white; border-color: var(--green); }
-
-  .nav { display: flex; gap: 12px; margin-top: 1rem; }
-  .btn-primary { flex: 1; padding: 14px; background: var(--green); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-  .btn-primary:hover { background: #155530; }
-  .btn-secondary { padding: 14px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; cursor: pointer; }
-  .btn-secondary:hover { border-color: var(--text); }
-
-  .confirm-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 1rem 0; }
-  .confirm-header { background: var(--green); color: white; padding: 14px 20px; font-family: 'Playfair Display', serif; font-size: 1.1rem; }
-  .confirm-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; gap: 12px; }
-  .confirm-row:last-child { border-bottom: none; }
-  .confirm-label { color: var(--muted); flex-shrink: 0; min-width: 90px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; padding-top: 2px; }
-  .confirm-val { font-weight: 500; text-align: right; }
-  .confirm-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; text-align: right; }
-  .confirm-price { color: var(--green); font-size: 0.85rem; text-align: right; }
-  .confirm-total { display: flex; justify-content: space-between; padding: 14px 20px; background: var(--cream); font-weight: 500; font-size: 1rem; }
-
-  .success-wrap { text-align: center; padding: 2rem 0; }
-  .checkmark { width: 64px; height: 64px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 1.8rem; }
-  .success-wrap h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 8px; }
-  .success-wrap p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
-  .new-order-btn { margin-top: 1.5rem; padding: 13px 32px; background: transparent; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; cursor: pointer; color: var(--text); }
-  .new-order-btn:hover { border-color: var(--green); color: var(--green); }
-
-  .admin-panel { margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--border); }
-  .admin-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-  .order-pill { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; font-size: 0.85rem; }
-  .order-pill-top { display: flex; justify-content: space-between; font-weight: 500; margin-bottom: 4px; }
-  .order-pill-detail { color: var(--muted); line-height: 1.7; }
-  .badge-kind { display: inline-block; font-size: 0.7rem; background: #fff4e5; color: #7a4a00; padding: 1px 7px; border-radius: 20px; margin-left: 6px; }
-  .clear-all { font-size: 0.78rem; color: var(--muted); background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-
-  .error-msg { color: var(--red); font-size: 0.82rem; margin-top: 6px; display: none; }
-  .error-msg.show { display: block; }
-  textarea { width: 100%; padding: 12px 16px; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text); resize: vertical; min-height: 80px; }
-  textarea:focus { outline: none; border-color: var(--green); }
-
-  @media (max-width: 480px) { .step-label { display: none; } }
+:root{--green:#1a6b3c;--green-light:#e8f4ee;--red:#c0392b;--red-light:#fdecea;--gold:#b8860b;--cream:#faf8f3;--border:#e0dbd0;--text:#1c1c1c;--muted:#6b6560;--white:#ffffff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.flag-bar{display:flex;height:5px;}.flag-bar div{flex:1;}
+.flag-bar .f1{background:#009246;}.flag-bar .f2{background:#fff;border-top:1px solid #e0dbd0;border-bottom:1px solid #e0dbd0;}.flag-bar .f3{background:#ce2b37;}
+header{text-align:center;padding:2.5rem 1rem 1.5rem;background:var(--white);border-bottom:1px solid var(--border);position:relative;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:600;letter-spacing:0.12em;}
+header p{font-size:0.85rem;letter-spacing:0.18em;color:var(--muted);margin-top:4px;text-transform:uppercase;}
+header .since{display:inline-block;margin-top:10px;font-size:0.75rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;}
+.admin-toggle{position:absolute;bottom:8px;right:12px;font-size:0.65rem;color:var(--border);cursor:pointer;user-select:none;padding:4px;}
+.admin-toggle:hover{color:var(--muted);}
+.admin-badge{display:none;position:absolute;top:8px;right:12px;background:var(--gold);color:white;font-size:0.65rem;padding:2px 8px;border-radius:20px;}
+body.admin-mode .admin-badge{display:block;}
+/* Price hidden by default, visible in admin mode */
+body:not(.admin-mode) .opt-price{display:none;}
+body:not(.admin-mode) .confirm-price{display:none;}
+body:not(.admin-mode) .confirm-total{display:none;}
+body:not(.admin-mode) .price-admin{display:none;}
+.container{max-width:680px;margin:0 auto;padding:2rem 1rem 4rem;}
+.steps{display:flex;align-items:center;justify-content:center;margin-bottom:2.5rem;}
+.step{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--muted);transition:all 0.3s;}
+.step.active .step-num{background:var(--green);border-color:var(--green);color:white;}
+.step.done .step-num{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.step-label{font-size:11px;color:var(--muted);}.step.active .step-label{color:var(--green);font-weight:500;}
+.step-line{flex:1;height:1px;background:var(--border);min-width:20px;max-width:50px;margin-bottom:16px;}
+.screen{display:none;}.screen.active{display:block;}
+.welcome-text{text-align:center;margin-bottom:2rem;}
+.welcome-text h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:8px;}
+.welcome-text p{color:var(--muted);font-size:0.9rem;line-height:1.6;}
+.field-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:8px;display:block;}
+input[type=text]{width:100%;padding:13px 16px;font-size:1rem;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);}
+input[type=text]:focus{outline:none;border-color:var(--green);}
+.field-group{margin-bottom:1.2rem;}
+.type-select{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+.type-btn{padding:16px;border:1px solid var(--border);border-radius:10px;background:var(--white);cursor:pointer;text-align:center;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.type-btn.selected{border-color:var(--green);background:var(--green-light);}
+.type-btn .type-icon{font-size:1.8rem;display:block;margin-bottom:6px;}
+.type-btn .type-name{font-size:0.95rem;font-weight:500;}
+.type-btn .type-sub{font-size:0.78rem;color:var(--muted);margin-top:2px;}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.section-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.section-icon.green{background:var(--green-light);}.section-icon.red{background:var(--red-light);}.section-icon.gold{background:#fdf6e3;}
+.section-head h3{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:400;}
+.section-head p{font-size:0.82rem;color:var(--muted);margin-top:1px;}
+.options-list{display:flex;flex-direction:column;gap:8px;margin:1rem 0;}
+.opt-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--white);cursor:pointer;transition:all 0.18s;}
+.opt-card:hover{border-color:#aaa;}.opt-card.selected{border-color:var(--green);background:var(--green-light);}
+.opt-card.skip-card{background:var(--cream);border-style:dashed;}.opt-card.skip-card.selected{background:var(--green-light);border-style:solid;}
+.opt-card input[type=radio]{margin-top:3px;accent-color:var(--green);flex-shrink:0;width:16px;height:16px;}
+.opt-info{flex:1;}.opt-name{font-size:0.95rem;font-weight:500;}
+.opt-desc{font-size:0.8rem;color:var(--muted);margin-top:3px;line-height:1.45;}
+.opt-cat{display:inline-block;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;padding:2px 7px;border-radius:20px;margin-bottom:3px;}
+.cat-vlees{background:#fdecea;color:#8b2020;}.cat-vis{background:#e8f0fb;color:#1a4080;}
+.cat-pasta{background:#fff4e5;color:#7a4a00;}.cat-pizza{background:#fdf0f8;color:#6b1a55;}
+.cat-lasagne{background:#f0e8fd;color:#3d1a80;}.cat-vegetarisch{background:var(--green-light);color:var(--green);}
+.cat-koffie{background:#f5efe6;color:#5a3a10;}
+.opt-price{font-size:0.88rem;font-weight:500;color:var(--green);flex-shrink:0;padding-left:8px;margin-top:2px;text-align:right;min-width:52px;}
+.allergens{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.allergen-tag{font-size:0.68rem;padding:2px 7px;border-radius:20px;background:#f5f0e8;color:#5a4a2a;border:1px solid #e0d5c0;}
+.sauce-selector{margin-top:8px;padding:10px 12px;background:#fffdf7;border:1px dashed #d0c8b0;border-radius:8px;}
+.sauce-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px;display:block;}
+.sauce-options{display:flex;flex-wrap:wrap;gap:6px;}
+.sauce-btn{padding:4px 12px;font-size:0.78rem;border:1px solid var(--border);border-radius:20px;background:var(--white);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text);transition:all 0.15s;}
+.sauce-btn.selected{background:var(--green);color:white;border-color:var(--green);}
+.nav{display:flex;gap:12px;margin-top:1rem;}
+.btn-primary{flex:1;padding:14px;background:var(--green);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.btn-primary:hover{background:#155530;}
+.btn-secondary{padding:14px 20px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.95rem;cursor:pointer;}
+.btn-secondary:hover{border-color:var(--text);}
+.confirm-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:1rem 0;}
+.confirm-header{background:var(--green);color:white;padding:14px 20px;font-family:'Playfair Display',serif;font-size:1.1rem;}
+.confirm-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 20px;border-bottom:1px solid var(--border);font-size:0.9rem;gap:12px;}
+.confirm-row:last-child{border-bottom:none;}
+.confirm-label{color:var(--muted);flex-shrink:0;min-width:90px;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;padding-top:2px;}
+.confirm-val{font-weight:500;text-align:right;}.confirm-sub{font-size:0.78rem;color:var(--muted);margin-top:2px;text-align:right;}
+.confirm-price{color:var(--green);font-size:0.85rem;text-align:right;}
+.confirm-total{display:flex;justify-content:space-between;padding:14px 20px;background:var(--cream);font-weight:500;font-size:1rem;}
+.success-wrap{text-align:center;padding:2rem 0;}
+.checkmark{width:64px;height:64px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.8rem;}
+.success-wrap h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:8px;}
+.success-wrap p{color:var(--muted);font-size:0.9rem;line-height:1.6;}
+.new-order-btn{margin-top:1.5rem;padding:13px 32px;background:transparent;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.95rem;cursor:pointer;color:var(--text);}
+.new-order-btn:hover{border-color:var(--green);color:var(--green);}
+.admin-panel{margin-top:3rem;padding-top:2rem;border-top:2px solid var(--border);}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.order-pill{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:0.85rem;}
+.order-pill-top{display:flex;justify-content:space-between;font-weight:500;margin-bottom:4px;}
+.order-pill-detail{color:var(--muted);line-height:1.7;}
+.badge-kind{display:inline-block;font-size:0.7rem;background:#fff4e5;color:#7a4a00;padding:1px 7px;border-radius:20px;margin-left:6px;}
+.clear-all{font-size:0.78rem;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
+.error-msg{color:var(--red);font-size:0.82rem;margin-top:6px;display:none;}.error-msg.show{display:block;}
+textarea{width:100%;padding:12px 16px;font-size:0.92rem;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);resize:vertical;min-height:80px;}
+textarea:focus{outline:none;border-color:var(--green);}
+/* PIN modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--white);border-radius:16px;padding:2rem;width:300px;text-align:center;}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.5rem;}
+.modal p{color:var(--muted);font-size:0.85rem;margin-bottom:1.2rem;}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:1.5rem;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:var(--white);transition:all 0.15s;}
+.pin-dot.filled{background:var(--green);border-color:var(--green);}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pin-btn{padding:14px;font-size:1.1rem;font-weight:500;border:1px solid var(--border);border-radius:10px;background:var(--white);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.pin-btn:hover{background:var(--green-light);border-color:var(--green);}
+.pin-error{color:var(--red);font-size:0.8rem;margin-top:0.8rem;min-height:1.2em;}
+.modal-close{margin-top:1rem;font-size:0.82rem;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;}
+@media(max-width:480px){.step-label{display:none;}}
 </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <h3>Admin toegang</h3>
+    <p>Voer de PIN in om prijzen te tonen</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn" onclick="pinDel()">&#9003;</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn" onclick="pinCancel()">&#x2715;</button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <button class="modal-close" onclick="pinCancel()">Annuleren</button>
+  </div>
+</div>
 
 <div class="flag-bar"><div class="f1"></div><div class="f2"></div><div class="f3"></div></div>
 <header>
   <h1>PICASSO</h1>
   <p>Ristorante Italiano</p>
-  <span class="since">Dal 2002 — Swifterbant</span>
+  <span class="since">Dal 2002 &mdash; Swifterbant</span>
+  <div class="admin-toggle" onclick="openPin()">&#xB7; &#xB7; &#xB7;</div>
+  <div class="admin-badge">Admin aan</div>
 </header>
 
 <div class="container">
@@ -149,12 +168,8 @@
     <div class="step" id="step5"><div class="step-num">5</div><div class="step-label">Bevestigen</div></div>
   </div>
 
-  <!-- Screen 1 -->
   <div class="screen active" id="screen1">
-    <div class="welcome-text">
-      <h2>Welkom bij Picasso</h2>
-      <p>Maak uw keuze voor het diner.<br>We zorgen dat alles klaar staat.</p>
-    </div>
+    <div class="welcome-text"><h2>Welkom bij Picasso</h2><p>Maak uw keuze voor het diner.<br>We zorgen dat alles klaar staat.</p></div>
     <div class="field-group">
       <label class="field-label">Uw naam</label>
       <input type="text" id="guestName" placeholder="Voornaam en achternaam" />
@@ -163,112 +178,58 @@
     <div class="field-group">
       <label class="field-label">Type menu</label>
       <div class="type-select">
-        <div class="type-btn selected" id="typeAdult" onclick="selectType('volwassene')">
-          <span class="type-icon">🍷</span><span class="type-name">Volwassene</span><span class="type-sub">Volledig menu</span>
-        </div>
-        <div class="type-btn" id="typeChild" onclick="selectType('kind')">
-          <span class="type-icon">🧒</span><span class="type-name">Kind</span><span class="type-sub">Kindermenu</span>
-        </div>
+        <div class="type-btn selected" id="typeAdult" onclick="selectType('volwassene')"><span class="type-icon">&#x1F377;</span><span class="type-name">Volwassene</span><span class="type-sub">Volledig menu</span></div>
+        <div class="type-btn" id="typeChild" onclick="selectType('kind')"><span class="type-icon">&#x1F9D2;</span><span class="type-name">Kind</span><span class="type-sub">Kindermenu</span></div>
       </div>
     </div>
-    <div class="nav"><button class="btn-primary" onclick="goNext(1)">Verder →</button></div>
+    <div class="nav"><button class="btn-primary" onclick="goNext(1)">Verder &#x2192;</button></div>
   </div>
 
-  <!-- Screen 2: Voorgerecht -->
   <div class="screen" id="screen2">
-    <div class="section-head">
-      <div class="section-icon green">🥗</div>
-      <div><h3>Voorgerecht</h3><p>Optioneel — kies één voorgerecht</p></div>
-    </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(2)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(2)">Verder →</button>
-    </div>
+    <div class="section-head"><div class="section-icon green">&#x1F957;</div><div><h3>Voorgerecht</h3><p>Optioneel &mdash; kies &eacute;&eacute;n voorgerecht</p></div></div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(2)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(2)">Verder &#x2192;</button></div>
     <div class="options-list" id="starterList"></div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(2)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(2)">Verder →</button>
-    </div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(2)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(2)">Verder &#x2192;</button></div>
   </div>
 
-  <!-- Screen 3: Hoofdgerecht -->
   <div class="screen" id="screen3">
-    <div class="section-head">
-      <div class="section-icon red">🍽️</div>
-      <div><h3>Hoofdgerecht</h3><p>Optioneel — kies één hoofdgerecht</p></div>
-    </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(3)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(3)">Verder →</button>
-    </div>
+    <div class="section-head"><div class="section-icon red">&#x1F37D;&#xFE0F;</div><div><h3>Hoofdgerecht</h3><p>Optioneel &mdash; kies &eacute;&eacute;n hoofdgerecht</p></div></div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(3)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(3)">Verder &#x2192;</button></div>
     <div class="options-list" id="mainList"></div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(3)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(3)">Verder →</button>
-    </div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(3)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(3)">Verder &#x2192;</button></div>
   </div>
 
-  <!-- Screen 4: Dessert -->
   <div class="screen" id="screen4">
-    <div class="section-head">
-      <div class="section-icon gold">🍮</div>
-      <div><h3>Dessert</h3><p>Optioneel — kies één dessert of koffie</p></div>
-    </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(4)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(4)">Bevestigen →</button>
-    </div>
+    <div class="section-head"><div class="section-icon gold">&#x1F36E;</div><div><h3>Dessert</h3><p>Optioneel &mdash; kies &eacute;&eacute;n dessert of koffie</p></div></div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(4)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(4)">Bevestigen &#x2192;</button></div>
     <div class="options-list" id="dessertList"></div>
     <div class="field-group" style="margin-top:0.5rem;">
-      <label class="field-label">Allergieën of opmerkingen</label>
+      <label class="field-label">Allergie&euml;n of opmerkingen</label>
       <textarea id="guestRemarks" placeholder="Bijv. allergisch voor pijnboompitten, geen ui..."></textarea>
     </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(4)">← Terug</button>
-      <button class="btn-primary" onclick="goNext(4)">Bevestigen →</button>
-    </div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(4)">&#x2190; Terug</button><button class="btn-primary" onclick="goNext(4)">Bevestigen &#x2192;</button></div>
   </div>
 
-  <!-- Screen 5: Bevestigen -->
   <div class="screen" id="screen5">
-    <div class="section-head">
-      <div class="section-icon green">✓</div>
-      <div><h3>Uw keuze</h3><p>Controleer uw bestelling</p></div>
-    </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(5)">← Terug</button>
-      <button class="btn-primary" onclick="submitOrder()">Bestelling versturen ✓</button>
-    </div>
+    <div class="section-head"><div class="section-icon green">&#x2713;</div><div><h3>Uw keuze</h3><p>Controleer uw bestelling</p></div></div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(5)">&#x2190; Terug</button><button class="btn-primary" onclick="submitOrder()">Bestelling versturen &#x2713;</button></div>
     <div class="confirm-card">
       <div class="confirm-header" id="confirmName"></div>
-      <div class="confirm-row">
-        <span class="confirm-label">Voorgerecht</span>
-        <div><div class="confirm-val" id="confirmStarter"></div><div class="confirm-price" id="confirmStarterPrice"></div></div>
-      </div>
-      <div class="confirm-row">
-        <span class="confirm-label">Hoofdgerecht</span>
-        <div><div class="confirm-val" id="confirmMain"></div><div class="confirm-sub" id="confirmMainSauce"></div><div class="confirm-price" id="confirmMainPrice"></div></div>
-      </div>
-      <div class="confirm-row">
-        <span class="confirm-label">Dessert</span>
-        <div><div class="confirm-val" id="confirmDessert"></div><div class="confirm-price" id="confirmDessertPrice"></div></div>
-      </div>
+      <div class="confirm-row"><span class="confirm-label">Voorgerecht</span><div><div class="confirm-val" id="confirmStarter"></div><div class="confirm-price" id="confirmStarterPrice"></div></div></div>
+      <div class="confirm-row"><span class="confirm-label">Hoofdgerecht</span><div><div class="confirm-val" id="confirmMain"></div><div class="confirm-sub" id="confirmMainSauce"></div><div class="confirm-price" id="confirmMainPrice"></div></div></div>
+      <div class="confirm-row"><span class="confirm-label">Dessert</span><div><div class="confirm-val" id="confirmDessert"></div><div class="confirm-price" id="confirmDessertPrice"></div></div></div>
       <div class="confirm-total"><span>Totaal</span><span id="confirmTotal"></span></div>
     </div>
     <div id="confirmRemarksRow" style="display:none;margin-bottom:1rem;padding:12px 16px;background:#fff4e5;border:1px solid #f0c070;border-radius:10px;font-size:0.88rem;">
-      <span style="font-weight:500;color:#7a4a00;">⚠️ Allergie / opmerking:</span>
+      <span style="font-weight:500;color:#7a4a00;">&#x26A0;&#xFE0F; Allergie / opmerking:</span>
       <span id="confirmRemarksText" style="color:#5a3a00;margin-left:6px;"></span>
     </div>
-    <div class="nav">
-      <button class="btn-secondary" onclick="goBack(5)">← Terug</button>
-      <button class="btn-primary" onclick="submitOrder()">Bestelling versturen ✓</button>
-    </div>
+    <div class="nav"><button class="btn-secondary" onclick="goBack(5)">&#x2190; Terug</button><button class="btn-primary" onclick="submitOrder()">Bestelling versturen &#x2713;</button></div>
   </div>
 
-  <!-- Screen 6: Succes -->
   <div class="screen" id="screen6">
     <div class="success-wrap">
-      <div class="checkmark">✓</div>
+      <div class="checkmark">&#x2713;</div>
       <h2>Grazie!</h2>
       <p id="successMsg"></p>
       <p style="margin-top:8px;">Uw keuze is vastgelegd.<br>Buon appetito!</p>
@@ -276,24 +237,31 @@
     </div>
   </div>
 
-  <!-- Admin -->
   <div class="admin-panel" id="adminPanel" style="display:none;">
-    <div class="admin-title">
-      Bestellingen overzicht
-      <button class="clear-all" onclick="clearAll()">Alles wissen</button>
-    </div>
+    <div class="admin-title">Bestellingen overzicht<button class="clear-all" onclick="clearAll()">Alles wissen</button></div>
     <div id="ordersList"></div>
   </div>
 </div>
 
 <script>
-const FORMSPREE = 'https://formspree.io/f/xpqknwdg';
+const FORMSPREE='https://formspree.io/f/xpqknwdg';
+const ADMIN_PIN='2002';
 
-const AL = {1:'🥚 Ei',2:'🐟 Vis',3:'☪️ Halal',4:'🥛 Melk',5:'🟡 Mosterd',6:'🥜 Noten',7:'🥜 Pinda\'s',8:'🌶️ Pittig',9:'🌶️ Extra pittig',10:'🌾 Gluten',11:'🫘 Soja',12:'🧂 Sulfiet',13:'🥗 Vegetarisch',14:'🦀 Schaaldieren'};
+// Change PIN here ^ to your own 4-digit code
 
-function badges(nums){
-  if(!nums||!nums.length)return '';
-  return '<div class="allergens">'+nums.map(n=>`<span class="allergen-tag">${AL[n]||n}</span>`).join('')+'</div>';
+const AL={1:'Ei',2:'Vis',3:'Halal',4:'Melk',5:'Mosterd',6:'Noten',7:"Pinda's",8:'Pittig',9:'Extra pittig',10:'Gluten',11:'Soja',12:'Sulfiet',13:'Vegetarisch',14:'Schaaldieren'};
+function badges(n){if(!n||!n.length)return '';return '<div class="allergens">'+n.map(x=>'<span class="allergen-tag">'+AL[x]+'</span>').join('')+'</div>';}
+
+// PIN
+let pinInput='';
+function openPin(){document.getElementById('pinModal').classList.add('show');pinInput='';updateDots();document.getElementById('pinError').textContent='';}
+function pinCancel(){document.getElementById('pinModal').classList.remove('show');pinInput='';updateDots();}
+function pinPress(d){if(pinInput.length>=4)return;pinInput+=d;updateDots();if(pinInput.length===4)setTimeout(checkPin,150);}
+function pinDel(){pinInput=pinInput.slice(0,-1);updateDots();}
+function updateDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinInput.length);}
+function checkPin(){
+  if(pinInput===ADMIN_PIN){document.body.classList.toggle('admin-mode');pinCancel();}
+  else{document.getElementById('pinError').textContent='Onjuiste PIN.';pinInput='';updateDots();}
 }
 
 const starters=[
@@ -307,28 +275,24 @@ const starters=[
   {name:'Salade Caprese',desc:'Pommodoro tomaten en mozzarella, met een dressing en pesto',price:9.95,allergens:[4,6,13]},
   {name:'Salade Mista',desc:'Een gemengde salade van knapperige ijsbergsla, tomaten, komkommer, rode ui, zwarte olijven, rucola en een dressing',price:8.75,allergens:[13]},
 ];
-
 const mains=[
   {name:'Geen hoofdgerecht',desc:'Ik kies geen hoofdgerecht',price:0,skip:true},
-  // Boerenschotels
-  {name:'Boerenschotel Kip/Kalf',desc:"Friet met döner kip of kalf stukjes, gesmolten kaas, knapperige ijsbergsla, tomaten en komkommer",price:14.00,cat:'vlees',allergens:[3,4,10],sauces:['Knoflooksaus','Uiensaus','Picasso saus 🌶️','Cocktailsaus']},
-  {name:'Boerenschotel Picasso',desc:"Favoriet van de Chef! Friet met gegrilde kipstukjes en gemarineerde Gamba's, gesmolten kaas, ijsbergsla, tomaten en komkommer",price:16.00,cat:'vlees',allergens:[2,3,4,10],sauces:['Knoflooksaus','Uiensaus','Picasso saus 🌶️','Cocktailsaus']},
-  // Plateaus
-  {name:'Spiedino di Pollo 300gr',desc:'Italiaans gekruide kipspies',price:15.95,cat:'vlees',allergens:[10,3],sauces:['Satesaus (+€3.00)','Champignonroomsaus (+€3.25)','Gorgonzolasaus (+€3.25)']},
+  {name:'Boerenschotel Kip/Kalf',desc:"Friet met doener kip of kalf stukjes, gesmolten kaas, knapperige ijsbergsla, tomaten en komkommer",price:14.00,cat:'vlees',allergens:[3,4,10],sauces:['Knoflooksaus','Uiensaus','Picasso saus','Cocktailsaus']},
+  {name:'Boerenschotel Picasso',desc:"Favoriet van de Chef! Friet met gegrilde kipstukjes en gemarineerde Gamba's, gesmolten kaas, ijsbergsla, tomaten en komkommer",price:16.00,cat:'vlees',allergens:[2,3,4,10],sauces:['Knoflooksaus','Uiensaus','Picasso saus','Cocktailsaus']},
+  {name:'Spiedino di Pollo 300gr',desc:'Italiaans gekruide kipspies',price:15.95,cat:'vlees',allergens:[10,3],sauces:['Satesaus (+3.00)','Champignonroomsaus (+3.25)','Gorgonzolasaus (+3.25)']},
   {name:'Pollo fritto',desc:'Mix van kiptenders en hotwings geserveerd met twee sausjes',price:15.95,cat:'vlees',allergens:[10,8,3]},
-  {name:'Bistecca al Ferri',desc:'Entrecote van de grill',price:19.95,cat:'vlees',allergens:[4,3,10],sauces:['Champignonroomsaus (+€3.25)','Gorgonzolasaus (+€3.25)','Pepe cremesaus (+€3.00)']},
-  {name:'Hamburger di Angus 200gr',desc:'Luchtig broodje met 100% Angusburger, gebakken ei, spek, tomaten, cheddarkaas, jalapeño peper, burgersaus en frietjes',price:16.95,cat:'vlees',allergens:[1,4,10,3]},
+  {name:'Bistecca al Ferri',desc:'Entrecote van de grill',price:19.95,cat:'vlees',allergens:[4,3,10],sauces:['Champignonroomsaus (+3.25)','Gorgonzolasaus (+3.25)','Pepe cremesaus (+3.00)']},
+  {name:'Hamburger di Angus 200gr',desc:'Luchtig broodje met 100% Angusburger, gebakken ei, spek, tomaten, cheddarkaas, jalapeno peper, burgersaus en frietjes',price:16.95,cat:'vlees',allergens:[1,4,10,3]},
   {name:'Hamburger di Pollo',desc:'Luchtig gebakken broodje met kipfilet van de grill, sla, rode ui, tomaten en cheddarkaas',price:15.95,cat:'vlees',allergens:[4,10,3]},
   {name:'Lamskotelletten',desc:'Van de grill',price:22.00,cat:'vlees',allergens:[3]},
-  {name:'Mixed Grill',desc:'Drie soorten vlees van de grill: kipfilet, Adana kebab, shoarma en een sausje naar keuze',price:19.50,cat:'vlees',allergens:[10,3],sauces:['Knoflooksaus','Uiensaus','Picasso saus 🌶️','Cocktailsaus']},
-  {name:'Gegrilde Zalm',desc:'Zalm van de grill met een frisse roomsaus',price:17.75,cat:'vis',allergens:[2,4],sauces:['Gorgonzolasaus (+€3.25)','Champignonroomsaus (+€3.25)','Limonccellosaus (+€3.25)']},
+  {name:'Mixed Grill',desc:'Drie soorten vlees van de grill: kipfilet, Adana kebab, shoarma en een sausje naar keuze',price:19.50,cat:'vlees',allergens:[10,3],sauces:['Knoflooksaus','Uiensaus','Picasso saus','Cocktailsaus']},
+  {name:'Gegrilde Zalm',desc:'Zalm van de grill met een frisse roomsaus',price:17.75,cat:'vis',allergens:[2,4],sauces:['Gorgonzolasaus (+3.25)','Champignonroomsaus (+3.25)','Limoncellosaus (+3.25)']},
   {name:'Stufado di Roma',desc:'Langzaam gegaard stoofpotje van heerlijk rundvlees en groenten. Geserveerd met knoflookbrood en frietjes',price:19.95,cat:'vlees',allergens:[3,10]},
-  // Pasta's
   {name:'Alla Bolognese (pasta)',desc:'Saus van tomaten, 100% rundergehakt en Parmezaanse kaas',price:13.75,cat:'pasta',allergens:[3,4,10]},
   {name:'Alla Carbonara (pasta)',desc:'Ham, spek, ui, eieren in roomsaus',price:13.75,cat:'pasta',allergens:[1,3,4,10]},
   {name:'Pollo (pasta)',desc:'Champignons, kip, ui, knoflook in roomsaus',price:14.50,cat:'pasta',allergens:[3,4,10]},
   {name:'Pesto (pasta)',desc:'Gegrilde kipstukjes, uien, tomaten, pijnboompitten, in pestosaus met Parmezaanse kaas',price:16.75,cat:'pasta',allergens:[4,10,6,7]},
-  {name:'Marinara (pasta)',desc:'Zalmsnippers, garnalen, tonijn, mosselen, ansjovis, ui, jalapeño pepers, kappertjes in tomatensaus',price:14.95,cat:'pasta',allergens:[10,14]},
+  {name:'Marinara (pasta)',desc:'Zalmsnippers, garnalen, tonijn, mosselen, ansjovis, ui, jalapeno pepers, kappertjes in tomatensaus',price:14.95,cat:'pasta',allergens:[10,14]},
   {name:'Vegetariane (pasta)',desc:'Champignons, paprika, ui, olijven, kappertjes, knoflook, Spaanse pepertjes in tomatensaus',price:14.75,cat:'vegetarisch',allergens:[10,13]},
   {name:'Quatro Formaggi (pasta)',desc:'Saus van vier soorten kaas: Gorgonzola, Parmezaanse kaas, Mozzarella en Rigatello',price:14.75,cat:'pasta',allergens:[4,10]},
   {name:'Cannelloni',desc:'Cannellonitubes gevuld met bladspinazie, Mozzarella en Ricotta in tomatensaus met Parmezaanse kaas',price:15.00,cat:'pasta',allergens:[4,10,13]},
@@ -336,11 +300,9 @@ const mains=[
   {name:'Salmone (pasta)',desc:'Zalm, uien, spinazie, garnalen in roomsaus',price:16.75,cat:'pasta',allergens:[1,2,4]},
   {name:"Gamba's kipfilet (pasta)",desc:"Gamba's, kipfilet, uien in roomsaus",price:16.75,cat:'pasta',allergens:[4,10,14]},
   {name:'Alla pistache (pasta)',desc:'Penne met spek, ui en pistachenoten in roomsaus',price:14.25,cat:'pasta',allergens:[3,4,6,7,10]},
-  // Lasagnes
   {name:'Lasagne Con Bechamelle',desc:'Lasagne met Bechamel- en bolognesesaus',price:14.75,cat:'lasagne',allergens:[1,3,4,10]},
   {name:'Lasagne Di Mare',desc:'Lasagne van gemengde vis, paprika, uien in tomatensaus',price:15.75,cat:'lasagne',allergens:[1,2,4,10]},
   {name:'Lasagne Hete Kip',desc:'Lasagne bladen, stukjes kipfilet, uien, champignonroomsaus',price:16.50,cat:'lasagne',allergens:[3,4,8]},
-  // Vleespizza's
   {name:'Pizza Calzone',desc:'Dubbelgevouwen pizza met tomatensaus, kaas, ham en salami',price:12.00,cat:'pizza',allergens:[1,4,6,7,10,11]},
   {name:'Pizza Calzone Bolognese',desc:'Dubbelgevouwen pizza met tomatensaus, kaas, ham, champignons, paprika, uien, salami en bolognesesaus',price:16.75,cat:'pizza',allergens:[1,4,6,7,10,11]},
   {name:'Pizza Calzone Speciale',desc:'Dubbelgevouwen pizza met tomatensaus, kaas, shoarma en gegrilde kipstukjes',price:16.45,cat:'pizza',allergens:[1,4,6,7,10,11]},
@@ -353,30 +315,25 @@ const mains=[
   {name:'Pizza Salami',desc:'Tomatensaus, kaas en salami',price:11.75,cat:'pizza',allergens:[4,10]},
   {name:'Pizza Prosciutto',desc:'Tomatensaus, kaas en ham',price:11.75,cat:'pizza',allergens:[4,10]},
   {name:'Pizza Carbonara speciaal',desc:'Tomatensaus, kaas, rosbief, ham, salami, spek, ui en ei',price:13.75,cat:'pizza',allergens:[1,4,10]},
-  // Vispizza's
   {name:'Pizza Tonno',desc:'Tomatensaus, kaas, tonijn en uien',price:12.25,cat:'pizza',allergens:[2,4,10]},
   {name:'Pizza Frutti Di Mare',desc:'Tomatensaus, kaas, mosselen, tonijn, zalm, garnalen, uien, kappertjes en ansjovis',price:16.00,cat:'pizza',allergens:[1,2,4,9,10,11,14]},
-  // Vegetarische pizza's
   {name:'Pizza Margherita',desc:'Tomatensaus, kaas en oregano',price:10.75,cat:'vegetarisch',allergens:[4,10,13]},
   {name:'Pizza Campagnola',desc:'Tomatensaus, kaas, champignons, paprika en uien',price:11.75,cat:'vegetarisch',allergens:[4,10,13]},
   {name:'Pizza Quatro Formaggi',desc:'Tomatensaus, kaas, Mozzarella, Parmezaanse kaas en Gorgonzola',price:12.85,cat:'vegetarisch',allergens:[4,10,13]},
-  {name:'Pizza Sarchiddú',desc:'Tomatensaus, kaas, paprika, artisjokken, asperges, uien, Spaanse peper en knoflook',price:12.85,cat:'vegetarisch',allergens:[4,9,10,13]},
-  // Vruchtenpizza's
-  {name:'Pizza Hawaii',desc:'Tomatensaus, kaas, ananas, ham +€1.50',price:11.75,cat:'pizza',allergens:[4,10]},
+  {name:'Pizza Sarchiddu',desc:'Tomatensaus, kaas, paprika, artisjokken, asperges, uien, Spaanse peper en knoflook',price:12.85,cat:'vegetarisch',allergens:[4,9,10,13]},
+  {name:'Pizza Hawaii',desc:'Tomatensaus, kaas, ananas, ham (+1.50)',price:11.75,cat:'pizza',allergens:[4,10]},
   {name:'Pizza Como',desc:'Tomatensaus, kaas, champignons, paprika, ham, uien en ananas',price:12.95,cat:'pizza',allergens:[4,10]},
-  // Speciale pizza's
   {name:'Pizza Picasso (specialiteit)',desc:'Specialiteit van het huis',price:16.75,cat:'pizza',allergens:[1,4,6,7,10,11]},
   {name:'Pizza Shoarma',desc:'Tomatensaus, kaas, shoarma',price:15.00,cat:'pizza',allergens:[4,10]},
-  {name:'Döner Kip (pizza)',desc:'Tomatensaus, kaas, döner kip',price:15.00,cat:'pizza',allergens:[4,10]},
-  {name:'Döner Kalf (pizza)',desc:'Tomatensaus, kaas, döner kalf',price:15.00,cat:'pizza',allergens:[3,10]},
+  {name:'Doner Kip (pizza)',desc:'Tomatensaus, kaas, doner kip',price:15.00,cat:'pizza',allergens:[4,10]},
+  {name:'Doner Kalf (pizza)',desc:'Tomatensaus, kaas, doner kalf',price:15.00,cat:'pizza',allergens:[3,10]},
   {name:'Pizza Carpaccio',desc:'Tomatensaus, kaas, rucola, rode uien, kappertjes en carpaccio. Keuze: balsamico of truffel mayonaise',price:15.00,cat:'pizza',allergens:[4,10]},
 ];
-
 const desserts=[
   {name:'Geen dessert',desc:'Ik kies geen dessert',price:0,skip:true},
   {name:'Chocolade Cheesecake',desc:'',price:6.95,allergens:[1,4,10]},
   {name:'Red Velvet Cake',desc:'',price:6.95,allergens:[1,4,10]},
-  {name:'Crème brulée',desc:'',price:6.95,allergens:[1,4]},
+  {name:'Creme brulee',desc:'',price:6.95,allergens:[1,4]},
   {name:'Salted Caramel',desc:'',price:6.95,allergens:[1,4]},
   {name:'Billionaire',desc:'',price:6.95,allergens:[1,4,10]},
   {name:'Dame Blanche',desc:'Vanille-ijs met warme chocoladesaus',price:6.75,allergens:[1,4]},
@@ -388,7 +345,6 @@ const desserts=[
   {name:'Italian Coffee',desc:'Amaretto en slagroom',price:6.50,cat:'koffie',allergens:[4]},
   {name:'Picasso Special Coffee',desc:'Huismix met 5 soorten drank, echt een aanrader!!!',price:8.50,cat:'koffie',allergens:[4]},
 ];
-
 const kindStarters=[
   {name:'Geen voorgerecht',desc:'Ik kies geen voorgerecht',price:0,skip:true},
   {name:'Panne e buro',desc:'Focaccia met kruidenboter',price:5.75,allergens:[10,4]},
@@ -412,55 +368,31 @@ let guestType='volwassene';
 let selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};
 let orders=[];
 
-function selectType(t){
-  guestType=t;
-  document.getElementById('typeAdult').classList.toggle('selected',t==='volwassene');
-  document.getElementById('typeChild').classList.toggle('selected',t==='kind');
-}
+function selectType(t){guestType=t;document.getElementById('typeAdult').classList.toggle('selected',t==='volwassene');document.getElementById('typeChild').classList.toggle('selected',t==='kind');}
 
-function renderOptions(items,containerId,groupName){
-  const c=document.getElementById(containerId);
-  c.innerHTML='';
+function renderOptions(items,cid,gn){
+  const c=document.getElementById(cid);c.innerHTML='';
   items.forEach((item,i)=>{
     const lbl=document.createElement('label');
     lbl.className='opt-card'+(item.skip?' skip-card':'');
-    const cat=item.cat?`<span class="opt-cat cat-${item.cat}">${item.cat}</span><br>`:'';
-    const price=item.price>0?`<div class="opt-price">€ ${item.price.toFixed(2)}</div>`:'<div class="opt-price" style="color:var(--muted)">—</div>';
+    const cat=item.cat?'<span class="opt-cat cat-'+item.cat+'">'+item.cat+'</span><br>':'';
+    const price=item.price>0?'<div class="opt-price">€ '+item.price.toFixed(2)+'</div>':'<div class="opt-price" style="color:var(--muted)">-</div>';
     let sauce='';
     if(item.sauces&&item.sauces.length){
-      sauce=`<div class="sauce-selector" onclick="event.stopPropagation()"><span class="sauce-label">Keuze saus</span><div class="sauce-options">${item.sauces.map(s=>`<button type="button" class="sauce-btn" onclick="selectSauce(this,event)">${s}</button>`).join('')}</div></div>`;
+      sauce='<div class="sauce-selector" onclick="event.stopPropagation()"><span class="sauce-label">Keuze saus</span><div class="sauce-options">'+item.sauces.map(s=>'<button type="button" class="sauce-btn" onclick="selectSauce(this,event)">'+s+'</button>').join('')+'</div></div>';
     }
-    lbl.innerHTML=`<input type="radio" name="${groupName}" value="${i}" onchange="selectOpt(this)">
-      <div class="opt-info">${cat}<div class="opt-name">${item.name}</div><div class="opt-desc">${item.desc}</div>${badges(item.allergens)}${sauce}</div>${price}`;
+    lbl.innerHTML='<input type="radio" name="'+gn+'" value="'+i+'" onchange="selectOpt(this)"><div class="opt-info">'+cat+'<div class="opt-name">'+item.name+'</div><div class="opt-desc">'+item.desc+'</div>'+badges(item.allergens)+sauce+'</div>'+price;
     c.appendChild(lbl);
   });
 }
 
-function selectSauce(btn,e){
-  e.preventDefault();
-  const card=btn.closest('.opt-card');
-  const radio=card.querySelector('input[type=radio]');
-  if(radio){radio.checked=true;selectOpt(radio);}
-  btn.closest('.sauce-options').querySelectorAll('.sauce-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-
-function selectOpt(input){
-  document.querySelectorAll(`input[name="${input.name}"]`).forEach(r=>{
-    r.closest('.opt-card').classList.toggle('selected',r===input);
-  });
-}
+function selectSauce(btn,e){e.preventDefault();const card=btn.closest('.opt-card');const r=card.querySelector('input[type=radio]');if(r){r.checked=true;selectOpt(r);}btn.closest('.sauce-options').querySelectorAll('.sauce-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+function selectOpt(input){document.querySelectorAll('input[name="'+input.name+'"]').forEach(r=>{r.closest('.opt-card').classList.toggle('selected',r===input);});}
 
 function showScreen(n){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen'+n).classList.add('active');
-  for(let i=1;i<=5;i++){
-    const el=document.getElementById('step'+i);
-    if(!el)continue;
-    el.classList.remove('active','done');
-    if(i<n&&n<=5)el.classList.add('done');
-    if(i===n&&n<=5)el.classList.add('active');
-  }
+  for(let i=1;i<=5;i++){const el=document.getElementById('step'+i);if(!el)continue;el.classList.remove('active','done');if(i<n&&n<=5)el.classList.add('done');if(i===n&&n<=5)el.classList.add('active');}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -476,40 +408,30 @@ function goNext(from){
     renderOptions(sl,'starterList','starter');
     renderOptions(ml,'mainList','main');
     renderOptions(dl,'dessertList','dessert');
-    // Pre-select "geen" options
-    ['starter','main','dessert'].forEach(g=>{
-      const first=document.querySelector(`input[name="${g}"][value="0"]`);
-      if(first){first.checked=true;selectOpt(first);}
-    });
+    ['starter','main','dessert'].forEach(g=>{const f=document.querySelector('input[name="'+g+'"][value="0"]');if(f){f.checked=true;selectOpt(f);}});
     showScreen(2);
-  } else if(from===2){
+  }else if(from===2){
     const s=document.querySelector('input[name="starter"]:checked');
-    const sl=guestType==='kind'?kindStarters:starters;
-    selections.starter=sl[parseInt(s?s.value:0)];
-    showScreen(3);
-  } else if(from===3){
+    selections.starter=(guestType==='kind'?kindStarters:starters)[parseInt(s?s.value:0)];showScreen(3);
+  }else if(from===3){
     const m=document.querySelector('input[name="main"]:checked');
-    const ml=guestType==='kind'?kindMains:mains;
-    selections.main=ml[parseInt(m?m.value:0)];
-    const sauceBtn=m?m.closest('.opt-card').querySelector('.sauce-btn.selected'):null;
-    selections.mainSauce=sauceBtn?sauceBtn.textContent:'';
-    showScreen(4);
-  } else if(from===4){
+    selections.main=(guestType==='kind'?kindMains:mains)[parseInt(m?m.value:0)];
+    const sb=m?m.closest('.opt-card').querySelector('.sauce-btn.selected'):null;
+    selections.mainSauce=sb?sb.textContent:'';showScreen(4);
+  }else if(from===4){
     const d=document.querySelector('input[name="dessert"]:checked');
-    const dl=guestType==='kind'?kindDesserts:desserts;
-    selections.dessert=dl[parseInt(d?d.value:0)];
+    selections.dessert=(guestType==='kind'?kindDesserts:desserts)[parseInt(d?d.value:0)];
     selections.remarks=document.getElementById('guestRemarks').value.trim();
-    // Fill confirm
     document.getElementById('confirmName').textContent=selections.name+(guestType==='kind'?' (kind)':'');
     document.getElementById('confirmStarter').textContent=selections.starter.name;
-    document.getElementById('confirmStarterPrice').textContent=selections.starter.price>0?'€ '+selections.starter.price.toFixed(2):'—';
+    document.getElementById('confirmStarterPrice').textContent=selections.starter.price>0?'€ '+selections.starter.price.toFixed(2):'';
     document.getElementById('confirmMain').textContent=selections.main.name;
-    document.getElementById('confirmMainSauce').textContent=selections.mainSauce?'🥣 '+selections.mainSauce:'';
-    document.getElementById('confirmMainPrice').textContent=selections.main.price>0?'€ '+selections.main.price.toFixed(2):'—';
+    document.getElementById('confirmMainSauce').textContent=selections.mainSauce?'Saus: '+selections.mainSauce:'';
+    document.getElementById('confirmMainPrice').textContent=selections.main.price>0?'€ '+selections.main.price.toFixed(2):'';
     document.getElementById('confirmDessert').textContent=selections.dessert.name;
-    document.getElementById('confirmDessertPrice').textContent=selections.dessert.price>0?'€ '+selections.dessert.price.toFixed(2):'—';
+    document.getElementById('confirmDessertPrice').textContent=selections.dessert.price>0?'€ '+selections.dessert.price.toFixed(2):'';
     const total=selections.starter.price+selections.main.price+selections.dessert.price;
-    document.getElementById('confirmTotal').textContent=total>0?'€ '+total.toFixed(2):'—';
+    document.getElementById('confirmTotal').textContent=total>0?'€ '+total.toFixed(2):'';
     const rr=document.getElementById('confirmRemarksRow');
     if(selections.remarks){document.getElementById('confirmRemarksText').textContent=selections.remarks;rr.style.display='block';}
     else rr.style.display='none';
@@ -522,42 +444,26 @@ function goBack(from){showScreen(from-1);}
 function submitOrder(){
   const total=selections.starter.price+selections.main.price+selections.dessert.price;
   const order={name:selections.name,type:guestType,starter:selections.starter.name,main:selections.main.name,mainSauce:selections.mainSauce,dessert:selections.dessert.name,remarks:selections.remarks,total:total.toFixed(2)};
-  fetch(FORMSPREE,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({naam:order.name,menu_type:order.type,voorgerecht:order.starter,hoofdgerecht:order.main+(order.mainSauce?' — saus: '+order.mainSauce:''),dessert:order.dessert,allergieen_opmerkingen:order.remarks||'—',totaal:total>0?'€ '+order.total:'—'})
-  }).catch(()=>{});
+  fetch(FORMSPREE,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({naam:order.name,menu_type:order.type,voorgerecht:order.starter,hoofdgerecht:order.main+(order.mainSauce?' - saus: '+order.mainSauce:''),dessert:order.dessert,allergieen:order.remarks||'-',totaal:total>0?'€ '+order.total:'-'})}).catch(()=>{});
   orders.push(order);
   document.getElementById('successMsg').textContent='Dank u, '+order.name+'.';
-  showScreen(6);
-  renderOrders();
+  showScreen(6);renderOrders();
 }
 
 function renderOrders(){
-  const panel=document.getElementById('adminPanel');
-  const list=document.getElementById('ordersList');
+  const panel=document.getElementById('adminPanel');const list=document.getElementById('ordersList');
   if(!orders.length){panel.style.display='none';return;}
-  panel.style.display='block';
-  list.innerHTML='';
+  panel.style.display='block';list.innerHTML='';
   orders.forEach(o=>{
-    const el=document.createElement('div');
-    el.className='order-pill';
-    const total=parseFloat(o.total)>0?'€ '+o.total:'—';
-    el.innerHTML=`<div class="order-pill-top"><span>${o.name}${o.type==='kind'?'<span class="badge-kind">kind</span>':''}</span><span>${total}</span></div>
-      <div class="order-pill-detail">🥗 ${o.starter}<br>🍽️ ${o.main}${o.mainSauce?' <em>('+o.mainSauce+')</em>':''}<br>🍮 ${o.dessert}${o.remarks?'<br>⚠️ <em>'+o.remarks+'</em>':''}</div>`;
+    const el=document.createElement('div');el.className='order-pill';
+    const total=parseFloat(o.total)>0?'€ '+o.total:'-';
+    el.innerHTML='<div class="order-pill-top"><span>'+o.name+(o.type==='kind'?'<span class="badge-kind">kind</span>':'')+'</span><span class="price-admin">'+total+'</span></div><div class="order-pill-detail">Voorgerecht: '+o.starter+'<br>Hoofdgerecht: '+o.main+(o.mainSauce?' ('+o.mainSauce+')':'')+'<br>Dessert: '+o.dessert+(o.remarks?'<br>Opmerking: '+o.remarks:'')+'</div>';
     list.appendChild(el);
   });
 }
 
 function clearAll(){if(confirm('Alle bestellingen wissen?')){orders=[];renderOrders();}}
-
-function resetForm(){
-  selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};
-  guestType='volwassene';
-  document.getElementById('guestName').value='';
-  document.getElementById('guestRemarks').value='';
-  document.getElementById('typeAdult').classList.add('selected');
-  document.getElementById('typeChild').classList.remove('selected');
-  showScreen(1);
-}
+function resetForm(){selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};guestType='volwassene';document.getElementById('guestName').value='';document.getElementById('guestRemarks').value='';document.getElementById('typeAdult').classList.add('selected');document.getElementById('typeChild').classList.remove('selected');showScreen(1);}
 </script>
 </body>
 </html>
