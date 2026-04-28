@@ -397,6 +397,7 @@ const mains=[
   {name:'Hamburger di Angus 200gr',desc:'Luchtig broodje met 100% Angusburger, gebakken ei, spek, tomaten, cheddarkaas, jalapeno peper, burgersaus en frietjes',price:16.95,cat:'vlees',allergens:[1,4,10,3]},
   {name:'Hamburger di Pollo',desc:'Luchtig gebakken broodje met kipfilet van de grill, sla, rode ui, tomaten en cheddarkaas',price:15.95,cat:'vlees',allergens:[4,10,3]},
   {name:'Lamskotelletten',desc:'Van de grill',price:22.00,cat:'vlees',allergens:[3]},
+  {name:'Spareribs',desc:'Naturel, tropical of hot, met salade en frites',price:23.50,cat:'vlees',allergens:[3,5],sauces:['Knoflooksaus','Uiensaus','Picasso saus','Cocktailsaus']},
   {name:'Mixed Grill',desc:'Drie soorten vlees van de grill: kipfilet, Adana kebab, shoarma en een sausje naar keuze',price:19.50,cat:'vlees',allergens:[10,3],sauces:['Knoflooksaus','Uiensaus','Picasso saus','Cocktailsaus']},
   {name:'Gegrilde Zalm',desc:'Zalm van de grill met een frisse roomsaus',price:17.75,cat:'vis',allergens:[2,4],sauces:['Gorgonzolasaus (+3.25)','Champignonroomsaus (+3.25)','Limoncellosaus (+3.25)']},
   {name:'Stufado di Roma',desc:'Langzaam gegaard stoofpotje van heerlijk rundvlees en groenten. Geserveerd met knoflookbrood en frietjes',price:19.95,cat:'vlees',allergens:[3,10]},
@@ -455,6 +456,7 @@ const desserts=[
   {name:'French Coffee',desc:'Gran Marnier en slagroom',price:6.50,cat:'koffie',allergens:[4]},
   {name:'Irish Coffee',desc:'Irish Whiskey en slagroom',price:6.50,cat:'koffie',allergens:[4]},
   {name:'Italian Coffee',desc:'Amaretto en slagroom',price:6.50,cat:'koffie',allergens:[4]},
+  {name:'Spanish Coffee',desc:'43 en slagroom',price:6.50,cat:'koffie',allergens:[4]},
   {name:'Picasso Special Coffee',desc:'Huismix met 5 soorten drank, echt een aanrader!!!',price:8.50,cat:'koffie',allergens:[4]},
 ];
 const kindStarters=[
@@ -479,6 +481,18 @@ const kindDesserts=[
 let guestType='volwassene';
 let selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};
 let orders=[];
+
+// Load saved orders from localStorage on startup
+function loadOrders(){
+  try{
+    const saved=localStorage.getItem('picasso_orders');
+    if(saved){orders=JSON.parse(saved);}
+  }catch(e){orders=[];}
+  renderOrders();
+}
+function saveOrders(){
+  try{localStorage.setItem('picasso_orders',JSON.stringify(orders));}catch(e){}
+}
 
 function selectType(t){guestType=t;document.getElementById('typeAdult').classList.toggle('selected',t==='volwassene');document.getElementById('typeChild').classList.toggle('selected',t==='kind');}
 
@@ -558,6 +572,7 @@ function submitOrder(){
   const order={name:selections.name,type:guestType,starter:selections.starter.name,main:selections.main.name,mainSauce:selections.mainSauce,dessert:selections.dessert.name,remarks:selections.remarks,total:total.toFixed(2)};
   fetch(FORMSPREE,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({naam:order.name,menu_type:order.type,voorgerecht:order.starter,hoofdgerecht:order.main+(order.mainSauce?' - saus: '+order.mainSauce:''),dessert:order.dessert,allergieen:order.remarks||'-',totaal:total>0?'€ '+order.total:'-'})}).catch(()=>{});
   orders.push(order);
+  saveOrders();
   document.getElementById('successMsg').textContent='Dank u, '+order.name+'.';
   showScreen(6);renderOrders();
 }
@@ -574,8 +589,9 @@ function renderOrders(){
   });
 }
 
-function clearAll(){if(confirm('Alle bestellingen wissen?')){orders=[];renderOrders();}}
+function clearAll(){if(confirm('Alle bestellingen wissen?')){orders=[];saveOrders();renderOrders();}}
 function resetForm(){selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};guestType='volwassene';document.getElementById('guestName').value='';document.getElementById('guestRemarks').value='';document.getElementById('typeAdult').classList.add('selected');document.getElementById('typeChild').classList.remove('selected');showScreen(1);}
+loadOrders();
 </script>
 
 <!-- Admin menu -->
