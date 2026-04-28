@@ -115,6 +115,47 @@ textarea:focus{outline:none;border-color:var(--green);}
 .pin-error{color:var(--red);font-size:0.8rem;margin-top:0.8rem;min-height:1.2em;}
 .modal-close{margin-top:1rem;font-size:0.82rem;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;}
 @media(max-width:480px){.step-label{display:none;}}
+
+  /* Admin panel */
+  .admin-menu{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;}
+  .admin-menu.show{display:flex;}
+  .admin-box{background:var(--white);border-radius:16px;padding:1.5rem;width:340px;max-height:90vh;overflow-y:auto;}
+  .admin-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.3rem;}
+  .admin-box .admin-sub{font-size:0.8rem;color:var(--muted);margin-bottom:1.2rem;}
+  .admin-btn-row{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+  .admin-action{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--cream);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;color:var(--text);transition:all 0.2s;text-align:left;}
+  .admin-action:hover{border-color:var(--green);background:var(--green-light);}
+  .admin-action.active{border-color:var(--green);background:var(--green-light);color:var(--green);}
+  .admin-action .ai{font-size:1.3rem;flex-shrink:0;}
+  .admin-action .at{flex:1;}
+  .admin-action .as{font-size:0.75rem;color:var(--muted);font-weight:400;margin-top:1px;}
+  .admin-close-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;color:var(--muted);margin-top:0.5rem;}
+  .admin-close-btn:hover{border-color:var(--red);color:var(--red);}
+  /* Report panel */
+  .report-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;}
+  .report-panel.show{display:flex;}
+  .report-box{background:var(--white);border-radius:16px;padding:1.5rem;width:380px;max-height:90vh;overflow-y:auto;}
+  .report-box h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+  .report-section{margin-bottom:1.2rem;}
+  .report-section-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+  .report-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.88rem;}
+  .report-row:last-child{border-bottom:none;}
+  .report-count{background:var(--green);color:white;font-size:0.72rem;font-weight:500;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+  .report-guest{font-size:0.82rem;}
+  .report-guest-name{font-weight:500;}
+  .report-guest-detail{color:var(--muted);font-size:0.78rem;margin-top:2px;line-height:1.5;}
+  .report-guest-remark{color:#7a4a00;font-size:0.75rem;margin-top:2px;}
+  .report-total-box{background:var(--cream);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:0.88rem;}
+  .report-total-row{display:flex;justify-content:space-between;padding:3px 0;}
+  .print-btn{width:100%;padding:11px;background:var(--green);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;margin-bottom:8px;}
+  .report-close{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;color:var(--muted);}
+  .no-orders{text-align:center;color:var(--muted);font-size:0.88rem;padding:1.5rem 0;}
+  @media print{
+    body > *{display:none!important;}
+    #printArea{display:block!important;padding:20px;}
+  }
+  #printArea{display:none;}
+
 </style>
 </head>
 <body>
@@ -252,7 +293,7 @@ const ADMIN_PIN='2002';
 const AL={1:'Ei',2:'Vis',3:'Halal',4:'Melk',5:'Mosterd',6:'Noten',7:"Pinda's",8:'Pittig',9:'Extra pittig',10:'Gluten',11:'Soja',12:'Sulfiet',13:'Vegetarisch',14:'Schaaldieren'};
 function badges(n){if(!n||!n.length)return '';return '<div class="allergens">'+n.map(x=>'<span class="allergen-tag">'+AL[x]+'</span>').join('')+'</div>';}
 
-// PIN
+// PIN & Admin menu
 let pinInput='';
 function openPin(){document.getElementById('pinModal').classList.add('show');pinInput='';updateDots();document.getElementById('pinError').textContent='';}
 function pinCancel(){document.getElementById('pinModal').classList.remove('show');pinInput='';updateDots();}
@@ -260,8 +301,72 @@ function pinPress(d){if(pinInput.length>=4)return;pinInput+=d;updateDots();if(pi
 function pinDel(){pinInput=pinInput.slice(0,-1);updateDots();}
 function updateDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinInput.length);}
 function checkPin(){
-  if(pinInput===ADMIN_PIN){document.body.classList.toggle('admin-mode');pinCancel();}
-  else{document.getElementById('pinError').textContent='Onjuiste PIN.';pinInput='';updateDots();}
+  if(pinInput===ADMIN_PIN){
+    pinCancel();
+    openAdminMenu();
+  } else {
+    document.getElementById('pinError').textContent='Onjuiste PIN.';
+    pinInput='';updateDots();
+  }
+}
+function openAdminMenu(){
+  updatePriceBtn();
+  document.getElementById('adminMenu').classList.add('show');
+}
+function closeAdminMenu(){document.getElementById('adminMenu').classList.remove('show');}
+function togglePrices(){
+  document.body.classList.toggle('admin-mode');
+  updatePriceBtn();
+}
+function updatePriceBtn(){
+  const on=document.body.classList.contains('admin-mode');
+  document.getElementById('priceStatus').textContent=on?'Momenteel zichtbaar':'Momenteel verborgen voor gasten';
+  document.getElementById('priceToggleIcon').textContent=on?'\u25CF':'\u25CB';
+  document.getElementById('priceToggleBtn').classList.toggle('active',on);
+}
+function showReport(type){
+  document.getElementById('adminMenu').classList.remove('show');
+  const content=document.getElementById('reportContent');
+  if(!orders.length){
+    document.getElementById('reportTitle').childNodes[0].textContent='Overzicht ';
+    content.innerHTML='<div class="no-orders">&#x1F4CB; Nog geen bestellingen ontvangen.</div>';
+    document.getElementById('reportPanel').classList.add('show');
+    return;
+  }
+  if(type==='totaal'){
+    document.getElementById('reportTitle').childNodes[0].textContent='Overzicht per gerecht ';
+    const stCounts={},mainCounts={},dsCounts={};
+    let totaal=0;
+    orders.forEach(o=>{
+      if(o.starter&&o.starter!=='Geen voorgerecht')stCounts[o.starter]=(stCounts[o.starter]||0)+1;
+      if(o.main&&o.main!=='Geen hoofdgerecht'){const k=o.main+(o.mainSauce?' ('+o.mainSauce+')':'');mainCounts[k]=(mainCounts[k]||0)+1;}
+      if(o.dessert&&o.dessert!=='Geen dessert')dsCounts[o.dessert]=(dsCounts[o.dessert]||0)+1;
+      totaal+=parseFloat(o.total)||0;
+    });
+    function section(title,counts){
+      const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+      if(!entries.length)return '<div class="report-section"><div class="report-section-title">'+title+'</div><div style="font-size:0.82rem;color:var(--muted);padding:6px 0;">Niemand gekozen</div></div>';
+      return '<div class="report-section"><div class="report-section-title">'+title+'</div>'+entries.map(([n,c])=>'<div class="report-row"><span>'+n+'</span><span class="report-count">'+c+'x</span></div>').join('')+'</div>';
+    }
+    content.innerHTML=
+      '<div class="report-total-box"><div class="report-total-row"><span>Aantal gasten</span><span><strong>'+orders.length+'</strong></span></div><div class="report-total-row"><span>Totaal omzet</span><span><strong>\u20AC '+totaal.toFixed(2)+'</strong></span></div></div>'+
+      section('Voorgerechten',stCounts)+section('Hoofdgerechten',mainCounts)+section('Desserts',dsCounts);
+  } else {
+    document.getElementById('reportTitle').childNodes[0].textContent='Gastenlijst ';
+    content.innerHTML='<div class="report-section">'+orders.map((o,i)=>{
+      const total=parseFloat(o.total)>0?'\u20AC '+o.total:'\u2014';
+      return '<div class="report-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><div style="display:flex;justify-content:space-between;width:100%;"><span class="report-guest-name">'+(i+1)+'. '+o.name+(o.type==='kind'?' <span class="badge-kind">kind</span>':'')+'</span><span class="price-admin" style="font-weight:500;color:var(--green);">'+total+'</span></div><div class="report-guest-detail">\uD83E\uDD57 '+o.starter+'<br>\uD83C\uDF7D\uFE0F '+o.main+(o.mainSauce?' ('+o.mainSauce+')':'')+'<br>\uD83C\uDF6E '+o.dessert+'</div>'+(o.remarks?'<div class="report-guest-remark">\u26A0\uFE0F '+o.remarks+'</div>':'')+'</div>';
+    }).join('')+'</div>';
+  }
+  document.getElementById('reportPanel').classList.add('show');
+}
+function closeReport(){document.getElementById('reportPanel').classList.remove('show');openAdminMenu();}
+function printReport(){
+  const title=document.getElementById('reportTitle').childNodes[0].textContent;
+  const body=document.getElementById('reportContent').innerHTML;
+  const d=new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('printArea').innerHTML='<h2 style="font-family:serif;margin-bottom:4px;">Picasso &mdash; '+title+'</h2><p style="color:#666;font-size:12px;margin-bottom:16px;">'+d+'</p>'+body;
+  window.print();
 }
 
 const starters=[
@@ -465,5 +570,45 @@ function renderOrders(){
 function clearAll(){if(confirm('Alle bestellingen wissen?')){orders=[];renderOrders();}}
 function resetForm(){selections={name:'',starter:null,main:null,mainSauce:'',dessert:null,remarks:''};guestType='volwassene';document.getElementById('guestName').value='';document.getElementById('guestRemarks').value='';document.getElementById('typeAdult').classList.add('selected');document.getElementById('typeChild').classList.remove('selected');showScreen(1);}
 </script>
+
+<!-- Admin menu -->
+<div class="admin-menu" id="adminMenu">
+  <div class="admin-box">
+    <h3>&#x1F511; Admin</h3>
+    <div class="admin-sub">Kies een actie</div>
+    <div class="admin-btn-row">
+      <button class="admin-action" id="priceToggleBtn" onclick="togglePrices()">
+        <span class="ai">&#x1F4B6;</span>
+        <div class="at"><div>Prijzen</div><div class="as" id="priceStatus">Momenteel verborgen voor gasten</div></div>
+        <span id="priceToggleIcon">&#x25CB;</span>
+      </button>
+      <button class="admin-action" onclick="showReport('totaal')">
+        <span class="ai">&#x1F4CA;</span>
+        <div class="at"><div>Overzicht per gerecht</div><div class="as">Hoeveel keer elk gerecht besteld</div></div>
+        <span>&#x203A;</span>
+      </button>
+      <button class="admin-action" onclick="showReport('gasten')">
+        <span class="ai">&#x1F465;</span>
+        <div class="at"><div>Gastenlijst</div><div class="as">Wie heeft wat besteld</div></div>
+        <span>&#x203A;</span>
+      </button>
+    </div>
+    <button class="admin-close-btn" onclick="closeAdminMenu()">Sluiten</button>
+  </div>
+</div>
+
+<!-- Report panel -->
+<div class="report-panel" id="reportPanel">
+  <div class="report-box">
+    <h3 id="reportTitle">Overzicht<button onclick="closeReport()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);">&#x2715;</button></h3>
+    <div id="reportContent"></div>
+    <button class="print-btn" onclick="printReport()">&#x1F5A8; Afdrukken</button>
+    <button class="report-close" onclick="closeReport()">Terug</button>
+  </div>
+</div>
+
+<!-- Print area -->
+<div id="printArea"></div>
+
 </body>
 </html>
